@@ -1,5 +1,5 @@
 import re
-from cati.utils.cati_config import *
+from cati.cati_utils.cati_config import *
 
 
 class Converter:

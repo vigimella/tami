@@ -1,7 +1,7 @@
 import os
-import cati.utils.tools as tls
+import cati.cati_utils.tools as tls
 from tqdm import tqdm
-from cati.utils.cati_config import DATASETS, DECOMPILED, RESULTS, timeExec
+from cati.cati_utils.cati_config import DATASETS, DECOMPILED, RESULTS, timeExec
 from PIL import Image
 
 

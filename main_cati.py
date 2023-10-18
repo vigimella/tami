@@ -7,12 +7,11 @@ import csv
 import os
 import re
 
-from cati.utils.cati_config import DECOMPILED, RESULTS, APK_DIR
-import cati.utils.process_data as process_data
-import cati.utils.opcode as opcode
-import cati.utils.tools as tools
-import cati.utils.image as image
-
+from cati.cati_utils.cati_config import DECOMPILED, RESULTS, APK_DIR
+import cati.cati_utils.process_data as process_data
+import cati.cati_utils.opcode as opcode
+import cati.cati_utils.tools as tools
+import cati.cati_utils.image as image
 
 def parse_args():
     parser = argparse.ArgumentParser(

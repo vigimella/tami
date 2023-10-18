@@ -17,61 +17,7 @@ import random
 import cv2
 
 
-def from_pic_to_code(lock, heatmap, filename, cati, results_path, smali_data):
-    if not os.path.exists(f"{cati}/{filename}.png"):
-        print(f"ERROR, file {cati}/{filename}.png does not exist...")
-        exit()
-    else:
-        cati_img = cv2.imread(f"{cati}/{filename}.png")
-        # convert image to float, necessary before resizing it
-        cleaned_heatmap = heatmap.reshape((heatmap.shape[0], heatmap.shape[1])) \
-            .astype('float32')
-        cleaned_heatmap = cv2.resize(cleaned_heatmap, (cati_img.shape[0], cati_img.shape[1]))
-        relevant_pixels = []
-        for y in range(cleaned_heatmap.shape[1]):
-            for x in range(cleaned_heatmap.shape[0]):
-                if cleaned_heatmap[x, y] > 0:
-                    relevant_pixels.append(enumerate_pixel(x, y, cleaned_heatmap))
-
-        mapped_smali = []
-        with open(f"{cati}/{filename}_legend.txt", "r") as legend:
-            for line in legend:
-                strm = line.strip().replace("[", "").replace("]", "")
-                smali_class = strm.split(" ")[0]
-                # start = enumerate_pixel(int(strm.split(" ")[1].split(",")[0]),
-                #                        int(strm.split(" ")[1].split(",")[1]),
-                #                        cati_img, start_zero=False)
-                end = enumerate_pixel(int(strm.split(" ")[2].split(",")[0]),
-                                      int(strm.split(" ")[2].split(",")[1]),
-                                      cati_img, start_zero=False)
-                # print(f"{smali_class} {start} {end}")
-                mapped_smali.append((int(end), smali_class))
-
-        smali_to_look_into = []
-        for rp in relevant_pixels:
-            for ms in mapped_smali:
-                if rp < ms[0]:
-
-                    if ms[1] not in smali_to_look_into and "google/android" not in ms[1]:
-                        smali_to_look_into.append(ms[1])
-
-                        smali_name = ms[1].split("/")[-1]
-                        with lock:
-                            if smali_name not in smali_data:
-                                smali_data[smali_name] = {'occ': 1, 'paths': [ms[1]]}
-                            else:
-                                smali_data[smali_name]['occ'] += 1
-                                smali_data[smali_name]['paths'].append(ms[1])
-
-                    break
-
-        with open(results_path + f"/smali/{filename}.txt", "w") as to_analyse:
-            for stli in smali_to_look_into:
-                to_analyse.write(stli + "\n")
-
-
 def clean_heatmap(pic, threshold):
-
     if threshold < 0 or threshold > 254:
         print(f"ERROR clean_heatmap: threashold {threshold} should be between 0 and 255, exiting...")
         exit()
@@ -95,9 +41,9 @@ def enumerate_pixel(x, y, pic, start_zero=True):
 
 
 def apply_gradcam(arguments, model, class_info, cati=True):
-
     # initialize the gradient class activation map
     cam = None
+
     if arguments.mode == 'cam-gradcam_st1':
         cam = Gradcam_stand1(model, target_layer_min_shape=arguments.shape_gradcam)
     elif arguments.mode == 'cam-gradcam_st2' or arguments.mode == 'cam-gradcam_st2-guided':
@@ -112,16 +58,6 @@ def apply_gradcam(arguments, model, class_info, cati=True):
         print(f"Gradcam required not found, exiting...")
         exit()
 
-    if cati:
-        # hardcoded path to cati folder with decompiled results
-        # TODO: improve checks on path
-        # ASSUMING that dataset path is DATASETS/name_date_timestamp/
-        cati_db = arguments.dataset[9:].split("_")[0]
-        cati_path_base = config.main_path + f"/cati/RESULTS/{cati_db}/"
-        if not os.path.isdir(cati_path_base):
-            print(f"ERROR! cati db with smali class info not found in {cati_path_base}, exiting...")
-            exit()
-
     # create folder in /results/images for this execution
     images_path = f"{config.main_path}results/images/{config.timeExec}_{arguments.load_model}_{arguments.mode}"
     os.mkdir(images_path)
@@ -135,13 +71,6 @@ def apply_gradcam(arguments, model, class_info, cati=True):
 
         # Adding also a '/' to ensure path correctness
         label_path = config.main_path + arguments.dataset + "/test/" + img_class
-        if cati:
-            cati_path = cati_path_base + img_class
-
-            # Initialize data struct for analyze heatmaps and decompiled smali
-            smali_code = {}
-            lock = threading.Lock()
-            threads = []
 
         # Get all file paths in 'label_path' for the class 'label'
         files = [i[2] for i in os.walk(label_path)]
@@ -188,10 +117,10 @@ def apply_gradcam(arguments, model, class_info, cati=True):
             # decoded = imagenet_utils.decode_predictions(preds)
             # (imagenetID, label, prob) = decoded[0][0]
             # label = "{}: {:.2f}%".format(label, prob * 100)
-            correctness = f"WRONG{class_info['class_names'][int(i)]}" if img_class != class_info["class_names"][int(i)]\
+            correctness = f"WRONG{class_info['class_names'][int(i)]}" if img_class != class_info["class_names"][int(i)] \
                 else f"{img_class}"
             label = "{} - {:.1f}%".format(correctness, preds[0][i] * 100)
-            #print("[INFO] {}".format(label))
+            # print("[INFO] {}".format(label))
 
             # build the heatmap
             heatmap = cam.compute_heatmap(image, class_index=i)
@@ -199,32 +128,10 @@ def apply_gradcam(arguments, model, class_info, cati=True):
             cleaned_heatmap = resize_and_store_heatmaps(heatmap, orig, label, class_images_path,
                                                         img_filename, correctness)
 
-            if cati:
-                # lock, heatmap, filename, cati, results_path, smali_data
-                new_thread = threading.Thread(target=from_pic_to_code, args=[lock, cleaned_heatmap, img_filename, cati_path,
-                                                                             class_images_path, smali_code])
-                while threading.activeCount() > 6:
-                    sleep(0.5)
-                new_thread.start()
-                threads.append(new_thread)
-
-        if cati:
-            for t in threads:
-                if t.is_alive():
-                    t.join()
-
-            # convert dict to list -> the dict was faster for threading search/insert on shared struct, but now we prefer
-            # list to order the element by occurencies
-            smali_code_list = []
-            for e in smali_code:
-                smali_code_list.append([smali_code[e]['occ'], e, smali_code[e]['paths']])
-            smali_code_list.sort(key=lambda x: x[0], reverse=True)
-
-            with open(class_images_path + "/SMALI_CLASS.txt", "w") as to_analyse:
-                for i in range(20):
-                    to_analyse.write(f"{smali_code_list[i][1]} {smali_code_list[i][0]} {smali_code_list[i][2]}\n")
 
 def resize_and_store_heatmaps(heatmap, orig, label, class_images_path, img_filename, correctness):
+    print(f'CLASS {class_images_path}')
+    print(f'IMG_FILENAME {img_filename}')
     # resize heatmap to size of origin file and copy to stored later
     # at this point the heatmap contains integer value scaled [0, 255]
     heatmap_origin_size = cv2.resize(heatmap.copy(), (orig.shape[1], orig.shape[0]))

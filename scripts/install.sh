@@ -84,14 +84,14 @@ fi
 # "${SCRIPTPATH}"/venv/bin/pip install -r "${SCRIPTPATH}"/requirements_ubuntu20.txt
 
 # DEPRECATED static main_path set
-#echo "Setting main_path to tami in utils.config"
+#echo "Setting main_path to tami in cati_utils.config"
 # tells git to ignore changes in config.py
 # can be reversed with 'git update-index --no-skip-worktree <file-list>'
-#git update-index --skip-worktree "${SCRIPTPATH}"/utils/config.py
+#git update-index --skip-worktree "${SCRIPTPATH}"/cati_utils/config.py
 # Using '@' insted of '/' as delimiter for sed, to avoid confusion
 #STANDARD_VAR_MAIN="main_path = \"/<INSERT_FULL_PATH_TO_REPO_FOLDER>/tami/\""
 #NEW_VAR_MAIN="main_path = \"${SCRIPTPATH}/\""
-#sed -i "s@${STANDARD_VAR_MAIN}@${NEW_VAR_MAIN}@g" "${SCRIPTPATH}"/utils/config.py
+#sed -i "s@${STANDARD_VAR_MAIN}@${NEW_VAR_MAIN}@g" "${SCRIPTPATH}"/cati_utils/config.py
 
 echo "Setup complete!"
 
