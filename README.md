@@ -288,12 +288,62 @@ Arguments:
   --include_all         Include all possible heatmaps in the IFIM-SSIM analysis (default, choose a random subset)
 ```
 
+### CATI tool
+CATI tool has the purpose of helping the security analyst to focus his attention on a subset of application classes.
+This tool is composed of different steps, such as:
+
+- APK reverse engineering
+
+```commandline
+python cat/apk_decompiler.py 
+```
+
+- Creation of Images from the .smali file
+
+```commandline
+python main_cati.py --help
+usage: main_cati.py [-h] [-t TRAINING] [-v VALIDATION] [-i IMAGE_SIZE] [-n INPUT_PATH] [-o OUTPUT_PATH] [--no-storage]
+                    [--no-results] [--csv-db]
+
+APK converter in OPCode and than in PNG
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Arguments:
+  -t TRAINING, --training TRAINING
+                        Percentage of data to be saved in training, insert a number between 10 to 90
+  -v VALIDATION, --validation VALIDATION
+                        Percentage of data to be saved in validation, insert a number between 10 to 90
+  -i IMAGE_SIZE, --image_size IMAGE_SIZE
+                        FORMAT ACCEPTED = SxC , the Size (SIZExSIZE) and Channel of the images in input default is [250x1]
+                        (reshape will be applied)
+  -n INPUT_PATH, --input_path INPUT_PATH
+                        Input path to smali files
+  -o OUTPUT_PATH, --output_path OUTPUT_PATH
+                        Output path to store results
+  --no-storage          Do not create a dataset in tami/DATASETS
+  --no-results          Do nothing in results folder, so no creation of images or legends of the smali files in cati/RESULTS
+  --csv-db              Generate a csv db + raw bytes files with the smali code
+```
+
+- Gives as output a subset of application classes highlighted from a Grad-CAM algorithm
+
+```commandline
+python post_processing.py -d DATASET/dataset_path --cg path/to/gradcam --cati yes-cati --lg cati/RESULTS/directory_name
+```
+**Before starting the CATI tool (in particular the first phase** *i.e., apk_decompiler.py* **) wrapper script named apktool and the latest apktool.jar must be added
+in the apktool folder stored in /tami/docker. For further information follow the [guidelines](https://apktool.org/docs/install/) provided 
+in section named "Linux".** 
+
+
 ## Authors & References
 
 * **Giacomo Iadarola** - *main contributor* - [Djack1010](https://github.com/Djack1010) giacomo.iadarola(at)iit.cnr.it
 * **Christian Peluso** - *cati tool* - [1Stohk1](https://github.com/1Stohk1)
 * **Francesco Mercaldo** - *contributor* - [FrancescoMercaldo](https://github.com/FrancescoMercaldo)
 * **Fabrizio Ravelli** - *contributor* - [reFraw](https://github.com/reFraw)
+* **Giovanni Ciaramella** - *contributor* - [vigimella](https://github.com/vigimella)
 
 <a name="publications"></a>
 If you are using this repository, please cite our work by referring to our publications (BibTex format):

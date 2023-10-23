@@ -1,4 +1,4 @@
-import os, re
+import os, shutil
 from PIL import Image, ImageStat
 
 
@@ -55,7 +55,7 @@ def apply_transparency(path_heatmap, path_to_store_new_heatmap, r, g, b):
 
     for item in datas:
 
-        if item[0] != r and item[1] != g and item[2] != b:
+        if not item[0] == r and item[1] == g and item[2] == b:
             newData.append((0, 0, 0, 0))
         else:
             newData.append(item)
@@ -197,3 +197,5 @@ def retrieve_smali_from_image(gradcam_path, dataset_path, legend_file_path):
                     final_report.write(f'The tool identified the following SMALI\'s class(es) \n')
                     for line in smali_classes_identified:
                         final_report.write(f'{line}\n')
+
+                # shutil.rmtree(temp_overlaid_img_dir)

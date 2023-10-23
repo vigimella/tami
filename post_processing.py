@@ -139,39 +139,39 @@ if __name__ == '__main__':
     # Initialize variables and logs
     modes.initialization_postprocessing(args, class_info)
 
-    # if 'cam-' in args.mode:
-    #     # LOADING MODEL
-    #
-    #     # Need to disable eager execution for some gradcams due to compatibility (old code written for TF1.0)
-    #     if args.mode in ['cam-gradcam++'] or '-guided' in args.mode:
-    #         tf.compat.v1.disable_eager_execution()
-    #
-    #     model = modes.load_model(args, required_img=None, required_chan=None,
-    #                              required_numClasses=class_info['n_classes'])
-    #
-    #     apply_gradcam(args, model, class_info, cati=True if args.mode == 'yes-cati' else False)
-    #
-    # elif args.mode == 'IFIM-SSIM':
-    #     IFIM_SSIM(args)
-    #
-    # elif args.mode == 'DexWave':
-    #     model = modes.load_model(args, required_img=None, required_chan=None,
-    #                              required_numClasses=class_info['n_classes'])
-    #
-    #     dexWave = DexWave()
-    #
-    #     os.makedirs(f"{config.main_path}/results/dexwaved/{config.timeExec}")
-    #     dexWave.attack_model(f"{config.main_path}{args.dataset}/test",
-    #                          f"{config.main_path}results/dexwaved/{config.timeExec}",
-    #                          model, class_info, target_class=args.target_class)
-    #
-    # elif args.mode == 'plot-generator':
-    #
-    #     generate_plot(args.type, args.load_file)
-
-    if args.c == 'yes-cati':
+    if args.model is None and args.mode is None and args.c == 'yes-cati':
         retrieve_smali_from_image(gradcam_path=args.cg, dataset_path=args.dataset,
                                   legend_file_path=args.lg)
+
+    elif 'cam-' in args.mode:
+        # LOADING MODEL
+
+        # Need to disable eager execution for some gradcams due to compatibility (old code written for TF1.0)
+        if args.mode in ['cam-gradcam++'] or '-guided' in args.mode:
+            tf.compat.v1.disable_eager_execution()
+
+        model = modes.load_model(args, required_img=None, required_chan=None,
+                                 required_numClasses=class_info['n_classes'])
+
+        apply_gradcam(args, model, class_info, cati=True if args.mode == 'yes-cati' else False)
+
+    elif args.mode == 'IFIM-SSIM':
+        IFIM_SSIM(args)
+
+    elif args.mode == 'DexWave':
+        model = modes.load_model(args, required_img=None, required_chan=None,
+                                 required_numClasses=class_info['n_classes'])
+
+        dexWave = DexWave()
+
+        os.makedirs(f"{config.main_path}/results/dexwaved/{config.timeExec}")
+        dexWave.attack_model(f"{config.main_path}{args.dataset}/test",
+                             f"{config.main_path}results/dexwaved/{config.timeExec}",
+                             model, class_info, target_class=args.target_class)
+
+    elif args.mode == 'plot-generator':
+
+        generate_plot(args.type, args.load_file)
 
     print_log("ENDING EXECUTION AT\t{}".format(time.strftime("%d-%m %H:%M:%S")), print_on_screen=True)
 

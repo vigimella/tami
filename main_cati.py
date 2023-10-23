@@ -83,12 +83,12 @@ if __name__ == "__main__":
     converter = opcode.Converter(args.csv_db)
 
     if args.input_path is not None:
-        DECOMPILED = args.input_path
+        DECOMPILED = os.path.join(DECOMPILED, args.input_path)
         if not os.path.exists(DECOMPILED):
             print(f"Input folder {DECOMPILED} not found, exiting...")
             exit()
     if args.output_path is not None:
-        RESULTS = args.output_path
+        RESULTS = os.path.join(RESULTS, args.output_path)
         if not os.path.exists('/'.join(RESULTS.split('/')[:-1])):
             print(f"Output folder {RESULTS} not found, exiting...")
             exit()
@@ -192,7 +192,8 @@ if __name__ == "__main__":
 
     if args.storage and not args.csv_db:
         print('Starting to build the dataset')
-        process_data.create_dataset(apk, args.output_path.split('/')[-1], args.image_size,
+
+        process_data.create_dataset(apk, RESULTS.split('/')[-1], args.image_size,
                                     args.training, args.validation)
         print('Creation of the dataset completed')
     end = datetime.now().strftime(FMT)
