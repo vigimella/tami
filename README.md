@@ -295,7 +295,7 @@ This tool is composed of different steps, such as:
 - APK reverse engineering
 
 ```commandline
-python cat/apk_decompiler.py 
+python cati/apk_decompiler.py 
 ```
 
 - Creation of Images from the .smali file
@@ -330,12 +330,13 @@ Arguments:
 - Gives as output a subset of application classes highlighted from a Grad-CAM algorithm
 
 ```commandline
-python post_processing.py -d DATASET/dataset_path --cg path/to/gradcam --cati yes-cati --lg cati/RESULTS/directory_name
+python post_processing.py -d DATASETS/dataset_path --cg path/to/gradcam --cati yes-cati --lg cati/RESULTS/directory_name
 ```
-**Before starting the CATI tool (in particular the first phase** *i.e., apk_decompiler.py* **) wrapper script named apktool and the latest apktool.jar must be added
-in the apktool folder stored in /tami/docker. For further information follow the [guidelines](https://apktool.org/docs/install/) provided 
-in section named "Linux".** 
+**Suggestions**
 
+Before starting the CATI tool (in particular the first phase *i.e., apk_decompiler.py* ) wrapper script named apktool and the latest apktool.jar must be added
+in the apktool folder stored in */tami/docker*. For further information follow the [guidelines](https://apktool.org/docs/install/) provided 
+in section named "Linux". 
 
 ## Authors & References
 

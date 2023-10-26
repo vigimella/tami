@@ -139,7 +139,7 @@ if __name__ == '__main__':
     # Initialize variables and logs
     modes.initialization_postprocessing(args, class_info)
 
-    if args.model is None and args.mode is None and args.c == 'yes-cati':
+    if args.c == 'yes-cati':
         retrieve_smali_from_image(gradcam_path=args.cg, dataset_path=args.dataset,
                                   legend_file_path=args.lg)
 

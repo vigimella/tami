@@ -1,5 +1,5 @@
 import os
-#from utils.config import timeExec
+from utils.config import timeExec
 
 # SET main_path at runtime with the absolute path of the project root folder
 path_list = os.path.realpath(__file__).split("/")[:-3]
