@@ -39,7 +39,8 @@ class DenseNet:
             inputs = Input(shape=(self.input_width_height, self.input_width_height, self.channels))
             if self.name == "DenseNet" or self.name == "DenseNet121":
                 #base_model = InceptionV3(weights='imagenet', include_top=False, input_tensor=inputs)
-                input_tensor = Input(shape=(224, 224, 3))
+                input_tensor = Input(shape=(self.input_width_height, self.input_width_height, self.channels))
+                #input_tensor = Input(shape=(224, 224, 3))
                 base_model = DenseNet121(input_tensor=input_tensor, weights='imagenet', include_top=False)
                 #base_model = InceptionV3(weights='imagenet', include_top=False, input_shape=(self.input_width_height, self.input_width_height, self.channels))
             else:
