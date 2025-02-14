@@ -7,6 +7,7 @@ import tensorflow as tf
 from code_models.custom_code_models.standard_CNN import StandardCNN as b_cnn
 from code_models.custom_code_models.standard_MLP import StandardMLP as b_mlp
 from code_models.custom_code_models.custom_CNN import CustomCNN as c_cnn
+from code_models.custom_code_models.custom_MobileNet import MobNetCustom as c_mobnet
 
 from utils import config
 import time
@@ -23,7 +24,7 @@ def parse_args():
     group.add_argument('-m', '--model', required=True, type=str, choices=['DATA', 'LE_NET', 'ALEX_NET', 'STANDARD_CNN',
                                                                           'STANDARD_MLP', 'CUSTOM_CNN', 'VGG16',
                                                                           'VGG19', 'Inception', 'ResNet50',
-                                                                          'MobileNet', 'DenseNet', 'EfficientNet',
+                                                                          'MobileNet', 'CustomMobileNet','DenseNet', 'EfficientNet',
                                                                           'QCNN'],
                        help='Choose the model to use between the ones implemented')
     group.add_argument('-d', '--dataset', required=True, type=str,
@@ -172,6 +173,13 @@ def _model_selection(model_choice, nclasses):
             exit()
         mod_class = MobNet(nclasses, config.IMG_DIM, config.CHANNELS, weights=config.WEIGHTS,
                            learning_rate=config.LEARNING_RATE)
+    elif model_choice == "CustomMobileNet":
+        from code_models.sota_code_models.MobileNet import MobNet
+        if config.CHANNELS != 3:
+            print("MobileNet requires images with channels 3, please set --image_size <YOUR_IMAGE_SIZE>x3, exiting...")
+            exit()
+        mod_class = c_mobnet(nclasses, config.IMG_DIM, config.CHANNELS, weights=config.WEIGHTS,
+                           learning_rate=config.LEARNING_RATE)
     elif model_choice == "DenseNet":
         from code_models.sota_code_models.Dense121 import DenseNet
         if config.CHANNELS != 3:
@@ -287,3 +295,4 @@ if __name__ == '__main__':
     end = time.perf_counter()
     print()
     print_log("EX. TIME: {} ".format(str(datetime.timedelta(seconds=end - start))), print_on_screen=True)
+
